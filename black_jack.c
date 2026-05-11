@@ -9,6 +9,7 @@ int dealer_logic();
 void deal_cards();
 
 int main{
+  int player_total, dealer_total;
   int dealer = 0;
   int user = 0;
   int money = 1000;
