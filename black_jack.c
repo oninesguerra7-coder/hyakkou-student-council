@@ -7,6 +7,7 @@ int check_win();
 int bet();
 int dealer_logic();
 void deal_cards();
+void create_deck();
 
 int main{
   int player_total, dealer_total;
