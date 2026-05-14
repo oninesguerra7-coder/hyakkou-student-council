@@ -1,4 +1,0 @@
-void show_card{
-
-  
-}
