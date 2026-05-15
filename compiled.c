@@ -7,7 +7,7 @@ char* drawCard();
 int player_turn();
 char check_win();
 int handValue(char hand[][3], int count);
-void printHand(char hand[][3], int count);
+void printHand(char hand[][3], int count, int hideFirst);
 
 struct game {
 
@@ -43,15 +43,14 @@ int main() {
 
         // display player hand
         printf("Player hand: ");
-        printHand(hands.p_hand, hands.p_count);
+        printHand(hands.p_hand, hands.p_count, 0);
         printf("Value: %d\n\n",
                handValue(hands.p_hand, hands.p_count));
 
         // display dealer hand
         printf("Dealer hand: ");
-        printHand(hands.d_hand, hands.d_count);
-        printf("Value: %d\n\n",
-               handValue(hands.d_hand, hands.d_count));
+        printHand(hands.d_hand, hands.d_count, 1);
+        printf("Value: ?\n\n");
 
         while (1) {
 
@@ -157,16 +156,15 @@ int player_turn() {
                hands.p_hand[hands.p_count - 1]);
 
         printf("\nPlayer hand: ");
-        printHand(hands.p_hand, hands.p_count);
+        printHand(hands.p_hand, hands.p_count, 0);
 
         printf("Value: %d\n\n",
                handValue(hands.p_hand, hands.p_count));
 
         printf("Dealer hand: ");
-        printHand(hands.d_hand, hands.d_count);
+        printHand(hands.d_hand, hands.d_count, 1);
 
-        printf("Value: %d\n\n",
-               handValue(hands.d_hand, hands.d_count));
+        printf("Value: ?\n\n");
 
         return 0; // continue round
     }
@@ -177,31 +175,13 @@ int player_turn() {
         int d = handValue(hands.d_hand, hands.d_count);
 
         printf("\nPlayer stands.\n\n");
-        
-        if (d < 17) {
-        
-                    printf("Dealer hits.\n\n");
-        
-                    while (d < 17) {
-        
-                        strcpy(hands.d_hand[hands.d_count], drawCard());
-                        hands.d_count++;
-        
-                        printf("Dealer drew: %s\n",
-                               hands.d_hand[hands.d_count - 1]);
-        
-                        d = handValue(hands.d_hand, hands.d_count);
-                    }
-        
-                    printf("\nDealer stands.\n\n");
-                }
-        
+
         printf("Player hand: ");
-        printHand(hands.p_hand, hands.p_count);
+        printHand(hands.p_hand, hands.p_count, 0);
         printf("Value: %d\n\n", p);
 
         printf("Dealer hand: ");
-        printHand(hands.d_hand, hands.d_count);
+        printHand(hands.d_hand, hands.d_count, 1);
         printf("Value: %d\n\n", d);
 
         if (p > d)
@@ -222,10 +202,17 @@ int player_turn() {
     }
 }
 
-void printHand(char hand[][3], int count) {
+void printHand(char hand[][3], int count, int hideFirst) {
 
     for (int i = 0; i < count; i++) {
-        printf("%s ", hand[i]);
+
+        if (i == 0 && hideFirst) {
+            printf("?? ");
+        }
+
+        else {
+            printf("%s ", hand[i]);
+        }
     }
 
     printf("\n");
