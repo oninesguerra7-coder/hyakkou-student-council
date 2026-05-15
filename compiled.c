@@ -177,7 +177,25 @@ int player_turn() {
         int d = handValue(hands.d_hand, hands.d_count);
 
         printf("\nPlayer stands.\n\n");
-
+        
+        if (d < 17) {
+        
+                    printf("Dealer hits.\n\n");
+        
+                    while (d < 17) {
+        
+                        strcpy(hands.d_hand[hands.d_count], drawCard());
+                        hands.d_count++;
+        
+                        printf("Dealer drew: %s\n",
+                               hands.d_hand[hands.d_count - 1]);
+        
+                        d = handValue(hands.d_hand, hands.d_count);
+                    }
+        
+                    printf("\nDealer stands.\n\n");
+                }
+        
         printf("Player hand: ");
         printHand(hands.p_hand, hands.p_count);
         printf("Value: %d\n\n", p);
