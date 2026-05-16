@@ -57,7 +57,7 @@ int main() {
             strcpy(hands.p_hand[hands.p_count++], drawCard());
             strcpy(hands.d_hand[hands.d_count++], drawCard());
         }
-
+        
         round++;
 
         int p = handValue(hands.p_hand, hands.p_count);
@@ -74,34 +74,80 @@ int main() {
 
         while (1) {
 
-            int stand = player_turn();
+            printf("Double down?(y/n): ");
+            char dd;
+            scanf(" %c", &dd);
 
-            char result = check_win(stand);
+            if (dd == 'y') {
 
-            if (result != 'n') {
-
-                // update money
-                if (result == 'p' || result == '1') {
-                    money += bet;
-                }
-                else if (result == 'd' || result == '0') {
-                    money -= bet;
+                if (bet * 2 > money) {
+                    printf("You don't have enough money to double down.\n");
+                    continue;
                 }
 
-                results(result);
+                bet *= 2;
 
-                printf("%sMoney: $%d%s\n",
-                    CYN, money, RESET);
+                strcpy(hands.p_hand[hands.p_count++], drawCard());
 
-                // game over if broke
-                if (money <= 0) {
-                    printf("%sYou ran out of money! Game over.%s\n",
-                        RED, RESET);
-                    return 0;
+                int p = handValue(hands.p_hand, hands.p_count);
+
+                printf("\nYou drew: %s%s%s\n",
+                       YEL, hands.p_hand[hands.p_count - 1], RESET);
+
+                printf("\nPlayer hand: ");
+                printHand(hands.p_hand, hands.p_count, 0);
+                printf("Value: %s%d%s\n\n", MGT, p, RESET);
+
+                char result = check_win(1);
+
+                if (result != 'n') {
+                    if (result == 'p' || result == '1') {
+                        money += bet;
+                    }
+                    else if (result == 'd' || result == '0') {
+                        money -= bet;
+                    }
+
+                    results(result);
+
+                    printf("%sMoney: $%d%s\n",
+                        CYN, money, RESET);
                 }
 
                 break;
             }
+            else if (dd == 'n') {
+                while (1) {
+                    int stand = player_turn();
+                    char result = check_win(stand);
+
+                    if (result != 'n') {
+                        if (result == 'p' || result == '1') {
+                            money += bet;
+                        }
+                        else if (result == 'd' || result == '0') {
+                            money -= bet;
+                        }
+
+                        results(result);
+
+                        printf("%sMoney: $%d%s\n",
+                            CYN, money, RESET);
+                        break;
+                    }
+                }
+
+                break;
+            }
+            else {
+                printf("Invalid input. Use 'y' or 'n'.\n");
+            }
+        }
+
+        if (money <= 0) {
+            printf("%sYou ran out of money! Game over.%s\n",
+                RED, RESET);
+            return 0;
         }
     }
 
@@ -204,7 +250,8 @@ char check_win(int stand) {
 
             d = handValue(hands.d_hand, hands.d_count);
         }
-
+        
+        if (d > 21) return '1';
         if (p > d) return 'p';
         if (d > p) return 'd';
 
@@ -308,7 +355,6 @@ char *drawCard() {
         for (int i = 0; i < 52; i++)
             deck[i] = i;
 
-        // Fisher-Yates shuffle
         for (int i = 51; i > 0; i--) {
 
             int j = rand() % (i + 1);
