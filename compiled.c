@@ -3,9 +3,17 @@
 #include <time.h>
 #include <string.h>
 
+#define RED   "\x1B[31m"
+#define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define CYN   "\x1B[36m"
+#define MGT   "\x1B[35m"
+#define RESET "\x1B[0m"
+
 char* drawCard();
 int player_turn();
-char check_win();
+void results(char result);
+char check_win(int stand);
 int handValue(char hand[][3], int count);
 void printHand(char hand[][3], int count, int hideFirst);
 
@@ -16,8 +24,6 @@ struct game {
 
     int p_count;
     int d_count;
-
-    int chips;
 };
 
 struct game hands;
@@ -25,104 +31,84 @@ struct game hands;
 int hidedealer;
 
 int main() {
-    int round = 0; // round counter
+
+    int round = 0;
+
     while (1) {
 
-        // intitialize hands to 0 (reset every round)
         hands.p_count = 0;
         hands.d_count = 0;
         hidedealer = 1;
 
-        // initial player cards
-        strcpy(hands.p_hand[hands.p_count++], drawCard());
-        strcpy(hands.p_hand[hands.p_count++], drawCard());
+        // initial deal
+        for (int i = 0; i < 2; i++) {
 
-        // initial dealer cards
-        strcpy(hands.d_hand[hands.d_count++], drawCard());
-        strcpy(hands.d_hand[hands.d_count++], drawCard());
+            strcpy(hands.p_hand[hands.p_count++], drawCard());
+            strcpy(hands.d_hand[hands.d_count++], drawCard());
+        }
 
         round++;
-        printf("\n| ROUND %d |\n\n", round);
 
-        // display player hand
+        int p = handValue(hands.p_hand, hands.p_count);
+
+        printf("\n%s| ROUND %d |%s\n\n", CYN, round, RESET);
+
         printf("Player hand: ");
         printHand(hands.p_hand, hands.p_count, 0);
-        printf("Value: %d\n\n",
-               handValue(hands.p_hand, hands.p_count));
+        printf("Value: %s%d%s\n\n", MGT, p, RESET);
 
-        // display dealer hand
         printf("Dealer hand: ");
         printHand(hands.d_hand, hands.d_count, hidedealer);
-        printf("Value: ?\n\n");
+        printf("Value: %s?%s\n\n", MGT, RESET);
 
         while (1) {
 
-            char result = check_win(); // early check for 21
-
-            if (result == 'p') {
-                hidedealer = 0;
-                printf("Dealer hand: ");
-                printHand(hands.d_hand, hands.d_count, hidedealer);
-                printf("Player wins!\n");
-                break;
-            }
-
-            else if (result == 'd') {
-                hidedealer = 0;
-                printf("Dealer hand: ");
-                printHand(hands.d_hand, hands.d_count, hidedealer);
-                printf("Dealer wins!\n");
-                break;
-            }
-
-            else if (result == '0') {
-                hidedealer = 0;
-                printf("Player busts!\n");
-                printHand(hands.d_hand, hands.d_count, hidedealer);
-                break;
-            }
-
-            else if (result == '1') {
-                hidedealer = 0;
-                printf("Dealer busts!\n");
-                printHand(hands.d_hand, hands.d_count, hidedealer);
-                break;
-            }
-
-            else if (result == 't') {
-                hidedealer = 0;
-                printf("Tie!\n");
-                printHand(hands.d_hand, hands.d_count, hidedealer);
-                break;
-            }
-
             int stand = player_turn();
 
-            if (stand) {
+            char result = check_win(stand);
 
-                hidedealer = 0;
-
-                int d = handValue(hands.d_hand, hands.d_count);
-
-                printf("\nDealer hits.\n\n");
-
-                while (d < 17) {
-
-                    strcpy(hands.d_hand[hands.d_count], drawCard());
-                    hands.d_count++;
-
-                    printf("Dealer drew: %s\n",
-                           hands.d_hand[hands.d_count - 1]);
-
-                    d = handValue(hands.d_hand, hands.d_count);
-                }
-
+            if (result != 'n') {
+                results(result);
                 break;
             }
         }
     }
 
     return 0;
+}
+
+void results(char result) {
+
+    int d = handValue(hands.d_hand, hands.d_count);
+
+    hidedealer = 0;
+
+    printf("\nDealer final hand: ");
+    printHand(hands.d_hand, hands.d_count, hidedealer);
+    printf("Value: %s%d%s\n\n", MGT, d, RESET);
+
+    switch(result) {
+
+        case 'p':
+            printf("%sPlayer wins!%s\n", GRN, RESET);
+            break;
+
+        case 'd':
+            printf("%sDealer wins!%s\n", RED, RESET);
+            break;
+
+        case '0':
+            printf("%sPlayer busts!%s\n", RED, RESET);
+            break;
+
+        case '1':
+            printf("%sDealer busts!%s\n", GRN, RESET);
+            break;
+
+        case 't':
+            printf("%sTie!%s\n", YEL, RESET);
+            break;
+    }
 }
 
 int handValue(char hand[][3], int count) {
@@ -135,6 +121,7 @@ int handValue(char hand[][3], int count) {
         char rank = hand[i][0];
 
         if (rank >= '2' && rank <= '9') {
+
             total += rank - '0';
         }
 
@@ -162,17 +149,38 @@ int handValue(char hand[][3], int count) {
     return total;
 }
 
-char check_win() {
+char check_win(int stand) {
 
     int p = handValue(hands.p_hand, hands.p_count);
     int d = handValue(hands.d_hand, hands.d_count);
 
-    return (p == 21 && d == 21) ? 't' :
-           (p == 21) ? 'p' :
-           (d == 21) ? 'd' :
-           (p > 21) ? '0' :
-           (d > 21) ? '1' :
-           'n';
+    if (p > 21) return '0';
+    if (d > 21) return '1';
+
+    if (p == 21 && d == 21) return 't';
+    if (p == 21) return 'p';
+    if (d == 21) return 'd';
+
+    if (stand) {
+
+        while (d < 17) {
+
+            strcpy(hands.d_hand[hands.d_count++], drawCard());
+
+            printf("\n%sDealer drew:%s %s%s%s\n",
+                   CYN, RESET,
+                   YEL, hands.d_hand[hands.d_count - 1], RESET);
+
+            d = handValue(hands.d_hand, hands.d_count);
+        }
+
+        if (p > d) return 'p';
+        if (d > p) return 'd';
+
+        return 't';
+    }
+
+    return 'n';
 }
 
 int player_turn() {
@@ -182,29 +190,28 @@ int player_turn() {
     printf("Hit (h) or Stand (s): ");
     scanf(" %c", &choice);
 
-    if (choice == 'h' || choice == 'H') {
+    if (choice == 'h') {
 
-        strcpy(hands.p_hand[hands.p_count], drawCard());
-        hands.p_count++;
+        strcpy(hands.p_hand[hands.p_count++], drawCard());
 
-        printf("\nYou drew: %s\n",
-               hands.p_hand[hands.p_count - 1]);
+        // recompute AFTER drawing
+        int p = handValue(hands.p_hand, hands.p_count);
+
+        printf("\nYou drew: %s%s%s\n",
+               YEL, hands.p_hand[hands.p_count - 1], RESET);
 
         printf("\nPlayer hand: ");
         printHand(hands.p_hand, hands.p_count, 0);
-
-        printf("Value: %d\n\n",
-               handValue(hands.p_hand, hands.p_count));
+        printf("Value: %s%d%s\n\n", MGT, p, RESET);
 
         printf("Dealer hand: ");
         printHand(hands.d_hand, hands.d_count, hidedealer);
+        printf("Value: %s?%s\n\n", MGT, RESET);
 
-        printf("Value: ?\n\n");
-
-        return 0; // continue round
+        return 0;
     }
 
-    else if (choice == 's' || choice == 'S') {
+    else if (choice == 's') {
 
         hidedealer = 0;
 
@@ -215,43 +222,19 @@ int player_turn() {
 
         printf("Player hand: ");
         printHand(hands.p_hand, hands.p_count, 0);
-        printf("Value: %d\n\n", p);
+        printf("Value: %s%d%s\n\n", MGT, p, RESET);
 
         printf("Dealer hand: ");
         printHand(hands.d_hand, hands.d_count, hidedealer);
-        printf("Value: %d\n\n", d);
+        printf("Value: %s%d%s\n\n", MGT, d, RESET);
 
-        if (d < 17) {
-
-            printf("Dealer hits.\n\n");
-
-            while (d < 17) {
-
-                strcpy(hands.d_hand[hands.d_count], drawCard());
-                hands.d_count++;
-
-                printf("Dealer drew: %s\n",
-                       hands.d_hand[hands.d_count - 1]);
-
-                d = handValue(hands.d_hand, hands.d_count);
-            }
-        }
-
-        if (p > d)
-            printf("Player wins!\n");
-
-        else if (d > p)
-            printf("Dealer wins!\n");
-
-        else
-            printf("Tie!\n");
-
-        return 1; // end round
+        return 1;
     }
 
     else {
+
         printf("\nInvalid input. Use 'h' or 's'.\n\n");
-        return 0; // let player try again
+        return 0;
     }
 }
 
@@ -260,11 +243,11 @@ void printHand(char hand[][3], int count, int hideFirst) {
     for (int i = 0; i < count; i++) {
 
         if (i == 0 && hideFirst) {
-            printf("?? ");
+            printf("%s??%s ", YEL, RESET);
         }
 
         else {
-            printf("%s ", hand[i]);
+            printf("%s%s%s ", YEL, hand[i], RESET);
         }
     }
 
@@ -294,9 +277,10 @@ char *drawCard() {
         for (int i = 0; i < 52; i++)
             deck[i] = i;
 
-        for (int i = 0; i < 52; i++) {
+        // Fisher-Yates shuffle
+        for (int i = 51; i > 0; i--) {
 
-            int j = rand() % 52;
+            int j = rand() % (i + 1);
 
             int temp = deck[i];
             deck[i] = deck[j];
