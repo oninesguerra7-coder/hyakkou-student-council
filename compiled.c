@@ -33,9 +33,20 @@ int hidedealer;
 int main() {
 
     int round = 0;
-
+    int money = 1000;
     while (1) {
 
+        int bet;
+
+        printf("\n%sYou have $%d.%s\n", CYN, money, RESET);
+        printf("Input amount to bet: ");
+        scanf("%d", &bet);
+
+        if (bet > money) {
+            printf("You don't have enough money to bet that amount.\n");
+            continue;
+        }
+        
         hands.p_count = 0;
         hands.d_count = 0;
         hidedealer = 1;
@@ -68,7 +79,27 @@ int main() {
             char result = check_win(stand);
 
             if (result != 'n') {
+
+                // update money
+                if (result == 'p' || result == '1') {
+                    money += bet;
+                }
+                else if (result == 'd' || result == '0') {
+                    money -= bet;
+                }
+
                 results(result);
+
+                printf("%sMoney: $%d%s\n",
+                    CYN, money, RESET);
+
+                // game over if broke
+                if (money <= 0) {
+                    printf("%sYou ran out of money! Game over.%s\n",
+                        RED, RESET);
+                    return 0;
+                }
+
                 break;
             }
         }
