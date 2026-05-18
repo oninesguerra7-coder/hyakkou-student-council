@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include <ctype.h>
-
 // ANSI Color Codes
 #define RED   "[31m"
 #define GRN   "[32m"
