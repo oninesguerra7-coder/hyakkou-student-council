@@ -319,7 +319,7 @@ int playerTurn(Game *g) {
 void updateMoney(Game *g, Result r) {
 
     if (r == PLAYER_WIN ||
-        r == DEALER_BUST) 
+        r == DEALER_BUST) {
     // add money to player
         g->money += g->bet;
     }
