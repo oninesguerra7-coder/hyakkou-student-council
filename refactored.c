@@ -258,6 +258,7 @@ Result checkImmediate(Game *g) {
 
     if (d > BLACKJACK)
         return DEALER_BUST;
+    
     //check for blackjack
     if (playerBlackjack &&
         dealerBlackjack)
@@ -271,6 +272,20 @@ Result checkImmediate(Game *g) {
         return DEALER_WIN;
 
     return NO_RESULT;
+}
+
+Result determineWinner(Game *g) {
+
+    int p = g->player.total; // store player total in p
+    int d = g->dealer.total; // store dealer total in d
+
+    if (p > d)
+        return PLAYER_WIN;
+
+    if (d > p)
+        return DEALER_WIN;
+
+    return TIE;
 }
 
 
