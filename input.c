@@ -1,3 +1,8 @@
+#include "input.h"
+
+#include <stdio.h>
+#include <stddef.h>
+
 void clearInputBuffer() {
     // proper input handling
     int c;
