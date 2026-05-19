@@ -1,3 +1,13 @@
+#include "game.h"
+#include "deck.h"
+#include "hand.h"
+#include "ui.h"
+#include "input.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 void initializeGame(Game *g) {
 
     g->money = STARTING_MONEY;
