@@ -217,7 +217,7 @@ void showHand(Hand *h, const char *name, int hidden) {
         char r = h->cards[1].rank; // dealer's visible card
 
         int value = (r >= '2' && r <= '9') ? // if 2 < value < 9
-                    r - '0' : (r == 'A') ? // 
+                    r - '0' : (r == 'A') ? // display value
                     11 : 10; // 11 if ace, 10 if face card
 
         printf("Value: %s%d+%s\n\n", MGT, value, RESET);
