@@ -1,3 +1,7 @@
+#include "ui.h"
+
+#include <stdio.h>
+
 void printCard(Card c) {
     printf("%s%c%c%s", YEL, c.rank, c.suit, RESET);
 }
