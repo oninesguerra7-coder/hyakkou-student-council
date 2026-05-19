@@ -239,41 +239,38 @@ void initialDeal(Game *g) {
     }
 }
 
-Result checkImmediate(Game *g) { // check result
+Result checkImmediate(Game *g) {
 
     int p = g->player.total;
     int d = g->dealer.total;
 
+    int playerBlackjack =
+        (p == BLACKJACK &&
+         g->player.count == 2); // check if only 2 cards and 21
+
+    int dealerBlackjack =
+        (d == BLACKJACK &&
+         g->dealer.count == 2);
+
+    // check for bust
     if (p > BLACKJACK)
         return PLAYER_BUST;
 
     if (d > BLACKJACK)
         return DEALER_BUST;
+    //check for blackjack
+    if (playerBlackjack &&
+        dealerBlackjack)
 
-    if (p == BLACKJACK && d == BLACKJACK)
         return TIE;
 
-    if (p == BLACKJACK)
+    if (playerBlackjack)
         return PLAYER_WIN;
 
-    if (d == BLACKJACK)
+    if (dealerBlackjack)
         return DEALER_WIN;
 
     return NO_RESULT;
-}
-
-Result determineWinner(Game *g) {
-
-    int p = g->player.total; // store player total in p
-    int d = g->dealer.total; // store dealer total in d
-
-    if (p > d)
-        return PLAYER_WIN;
-
-    if (d > p)
-        return DEALER_WIN;
-
-    return TIE;
 }
 
 
