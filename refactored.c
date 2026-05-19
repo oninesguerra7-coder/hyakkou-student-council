@@ -273,7 +273,7 @@ void dealerTurn(Game *g) {
 
     printf("\nDealer turn...\n\n");
 
-    while (g->dealer.total < DEALER_STAND) {
+    while (g->dealer.total < DEALER_STAND) { // hit until 17
 
         addCard(&g->dealer, drawCard(g));
 
@@ -338,7 +338,7 @@ void showResult(Game *g, Result r) {
     showHand(&g->player, "Player", 0);
     showHand(&g->dealer, "Dealer", 0);
 
-    switch (r) {
+    switch (r) { 
 
         case PLAYER_WIN:
             printf("%sPlayer wins!%s\n", GRN, RESET);
@@ -371,13 +371,11 @@ void playRound(Game *g) {
 
     static int round = 1;
 
-    printf("\n%s| ROUND %d |%s\n\n",
-           CYN,
+    printf("\n%s| ROUND %d |%s\n\n", CYN,
            round++,
            RESET);
 
-    printf("%sMoney: $%d%s\n\n",
-           CYN,
+    printf("%sMoney: $%d%s\n\n", CYN,
            g->money,
            RESET);
 
@@ -499,7 +497,7 @@ void clearInputBuffer() {
     // proper input handling
     int c;
     while ((c = getchar()) != '\n' &&
-           c != EOF);
+           c != EOF); // clear leftover character in buffer
 }
 
 char getChoice(
