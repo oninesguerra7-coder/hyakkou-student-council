@@ -1,3 +1,5 @@
+#include "hand.h"
+
 void resetHand(Hand *h) {
 
     h->count = 0;
