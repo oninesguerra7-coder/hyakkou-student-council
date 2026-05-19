@@ -1,3 +1,7 @@
+#include "deck.h"
+
+#include <stdlib.h>
+
 void shuffleDeck(Game *g) {
     // Start from last card and swap backwards
     for (int i = DECK_SIZE - 1; i > 0; i--) {
